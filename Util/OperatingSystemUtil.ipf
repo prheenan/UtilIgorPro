@@ -65,6 +65,7 @@ Static Function read_csv_to_path(basename,igor_path,[first_line])
 	LoadWave/Q/J/D/K=1/L={0,first_line,0,0,0}/A=$(basename) igor_path	
 End Function
 
+
 Static Function execute_python(PythonCommand)
 	// executes a python command, given the options
 	//
@@ -75,6 +76,10 @@ Static Function execute_python(PythonCommand)
 	String PythonCommand
 	ModOperatingSystemUtil#assert_python_binary_accessible()
 	// POST: we can for sure call the python binary
+	if (!running_windows())
+		PythonCommand = ReplaceString(mac_preamble(), PythonCommand, "/");
+	endif
+	PythonCommand = ReplaceString(":",PythonCommand,"/");
 	ModOperatingSystemUtil#os_command_line_execute(PythonCommand)
 End Function
 
@@ -271,11 +276,16 @@ Static Function /S sanitize_mac_path_for_igor(path)
 	// Returns:
 	//		path, with leading "C:/" replaced by /c/ 
 	//
-	String path
-	String igor_path = ModOperatingSystemUtil#to_igor_path(path)
-       igor_path = mac_preamble() + igor_path
+	String path;
+	String igor_path = ModOperatingSystemUtil#to_igor_path(path);
+	String expected_preamble =  mac_preamble();
+	String actual_preamble =  igor_path[0,strlen(expected_preamble)];
+	Variable preamble_exists = (cmpstr(actual_preamble,expected_preamble));
+	if (!preamble_exists)
+		igor_path = mac_preamble() + igor_path;
+	endif
 	// replace possible double colons
-	igor_path = ModOperatingSystemUtil#replace_double(":",igor_path)
+	igor_path = ModOperatingSystemUtil#replace_double(":",igor_path);
 	return igor_path
 End Function
 

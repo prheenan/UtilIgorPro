@@ -788,6 +788,43 @@ Static Function /S string_element(list,index,[sep])
 	return StringFromList(index,list,sep)
 End Function
 
+Static Function /S pwd_igor_path(path_name,[n_up_relative])
+	// prints the OS-specific working directory at path_name, moving up 
+	// n_up_relative times 
+	//
+	// Args;
+	// path_name: the igor path name of interest
+	// n_up_relative: the (defaulted zero) number of steps *up* to take,
+	// relative to path_name.  
+	
+	// Returns
+	//	the absolute OS-specific path 
+	// /Z: Get ingormation only if it eists
+	String path_name
+	Variable n_up_relative;
+	GetFileFolderInfo /Q/Z/P=$(path_name);
+	ModErrorUtil#Assert(V_flag == 0 ,msg=("Couldn't find path" + path_name));
+	// POST: found the path.
+	String current_path = S_path;
+	if (n_up_relative > 0)
+		//The optional options parameter is a bitmask specifying the search options:
+		// 1: Search backwards from start.
+		String path_delim = ":";
+		Variable options = 0x1;
+		Variable start = strlen(S_path);
+		Variable n_found = 0
+		do
+			Variable loc = strsearch(current_path,path_delim,start,options);
+			ModErrorUtil#Assert(loc > 0 ,msg=("Couldn't find enough levels in" + current_path));
+			start = loc-1
+			n_found = n_found + 1
+		while (n_found < n_up_relative)
+		// POST: have a substring we care about; modify the path 
+		current_path = current_path[0,loc];
+	endif
+	return current_path
+End Function
+
 Static Function FileExists(mFile)
 	// Returns true is the give igor-style path for mFile exists
 	// 	Args:
