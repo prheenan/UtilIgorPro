@@ -3,6 +3,8 @@
 
 #pragma ModuleName = ModOperatingSystemUtil
 #include ":ErrorUtil"
+#include ":IoUtil"
+
 
 // XXX TODO README:
 // (1) python2.7
@@ -82,10 +84,6 @@ Static Function execute_python(PythonCommand)
 	if (!running_windows())
 		PythonCommand = ReplaceString(mac_preamble(), PythonCommand, "/");
 		PythonCommand = ReplaceString(":",PythonCommand,"/");		
-	else
-		PythonCommand = ReplaceString(windows_preamble(), PythonCommand, "");	
-		PythonCommand = ReplaceString(":",PythonCommand,"/");		
-		PythonCommand = windows_preamble() + PythonCommand	
 	endif
 	ModOperatingSystemUtil#os_command_line_execute(PythonCommand)
 End Function
@@ -237,7 +235,9 @@ Static Function /S sanitize_path_for_windows(path)
 		path = path[1,n]
 	endif
 	// POST: no leading /
-	return replace_start("c/",path,"C:/")
+	path = replacestring(":",path,"/")
+	path = replace_double("/",path)
+	return replace_start("C/",path,"C:/")
 End Function
 
 Static Function /S replace_start(needle,haystack,replace_with)
@@ -252,7 +252,7 @@ Static Function /S replace_start(needle,haystack,replace_with)
 	String needle,haystack,replace_with
 	Variable n_needle = strlen(needle)
 	Variable n_haystack = strlen(haystack)
-	if ( (GrepString(haystack,"^" + needle)))
+	if ( (GrepString(haystack,"(?i)^" + needle)))
 		haystack = replace_with + haystack[n_needle,n_haystack]
 	endif 
 	return haystack
