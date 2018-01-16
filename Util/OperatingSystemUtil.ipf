@@ -65,6 +65,9 @@ Static Function read_csv_to_path(basename,igor_path,[first_line])
 	LoadWave/Q/J/D/K=1/L={0,first_line,0,0,0}/A=$(basename) igor_path	
 End Function
 
+Static Function /S windows_preamble()
+	return "C:/"
+End Function
 
 Static Function execute_python(PythonCommand)
 	// executes a python command, given the options
@@ -78,8 +81,12 @@ Static Function execute_python(PythonCommand)
 	// POST: we can for sure call the python binary
 	if (!running_windows())
 		PythonCommand = ReplaceString(mac_preamble(), PythonCommand, "/");
+		PythonCommand = ReplaceString(":",PythonCommand,"/");		
+	else
+		PythonCommand = ReplaceString(windows_preamble(), PythonCommand, "");	
+		PythonCommand = ReplaceString(":",PythonCommand,"/");		
+		PythonCommand = windows_preamble() + PythonCommand	
 	endif
-	PythonCommand = ReplaceString(":",PythonCommand,"/");
 	ModOperatingSystemUtil#os_command_line_execute(PythonCommand)
 End Function
 
