@@ -129,7 +129,7 @@ Static Function /S python_binary_string()
 	if (running_windows())
 		return "C:/Program Files/Anaconda2/python"
 	else
-		return "//anaconda/bin/python"
+		return "//anaconda/bin/python2"
 	endif
 End Function
 
