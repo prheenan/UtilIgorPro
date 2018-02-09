@@ -400,7 +400,7 @@ Static Function get_output_waves(waves_references,output,[skip_lines,base_name,k
 		// kill the output file
 		// /Z: if the file doesn't exist, dont worry about it  (we assert we deleted below)
 		DeleteFile /Z (igor_path)
-		ModErrorUtil#Assert(V_flag == 0,msg="Couldn't delete output file")
+		ModErrorUtil#Assert(V_flag == 0,msg="Couldn't delete output file: " + igor_path + " Is it open somewhere?")
 	EndIf
 End Function
 
