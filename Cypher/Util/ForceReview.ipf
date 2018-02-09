@@ -1,6 +1,7 @@
 #pragma rtGlobals=3	
 
 #pragma ModuleName = ModForceReview 
+#include "::OfflineAsylum"
 
 Static Function offset_from_wave_base(data_folder,base_name,trace)
 	// Given a data folder, and a base name associted with the force review graph,
@@ -27,8 +28,8 @@ Static Function offset_from_wave_base(data_folder,base_name,trace)
 	endif
 	// we want the absolute coordinate, regardless of whatever asylum says
 	// It 'slices' the data in force review based on the 'indexes' note variable 
-	String saved_idx= ModAsylumInterface#get_indexes(Note($ApproachName))
-	Variable asylum_offset = ModAsylumInterface#get_index_field_element(saved_idx,0)
+	String saved_idx=  ModOfflineAsylum#get_indexes(Note($ApproachName))
+	Variable asylum_offset =  ModOfflineAsylum#get_index_field_element(saved_idx,0)
 	offset = offset + asylum_offset			
 	Variable n_approach = DimSize( $ApproachName,0)
 	Variable n_dwell = DimSize($(DwellName),0)

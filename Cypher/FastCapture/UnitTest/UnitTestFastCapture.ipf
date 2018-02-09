@@ -45,9 +45,9 @@ Static Function assert_data_matches(saved_wave,zsnsr_volts,defl_volts,tolerance_
 	Variable tolerance_relative
 	String note_expected = Note(zsnsr_volts)
 	Make /O/N=0/FREE expected_z_meters,expected_defl_meters
-	Variable invols = ModAsylumInterface#note_invols(note_expected)
-	Variable z_sens = ModAsylumInterface#note_z_sensitivity(note_expected)
-	ModAsylumInterface#volts_to_meters(zsnsr_volts,defl_volts,z_sens,invols,expected_z_meters,expected_defl_meters)
+	Variable invols = ModOfflineAsylum#note_invols(note_expected)
+	Variable z_sens =  ModOfflineAsylum#note_z_sensitivity(note_expected)
+	 ModOfflineAsylum#volts_to_meters(zsnsr_volts,defl_volts,z_sens,invols,expected_z_meters,expected_defl_meters)
 	Duplicate /FREE/O zsnsr_volts,ZSnsr_meters
 	Duplicate /FREE/O defl_volts,Defl_meters
 	ModErrorUtil#assert_wave_exists(saved_wave)	
@@ -80,10 +80,10 @@ Static Function reload_saved_wave_and_check(inf_tmp,suffix_before_save,tolerance
 	Wave /T globals = root:packages:MFP3D:Main:Strings:GlobalStrings
 	String path_to_save = globals[%SaveImage]
 	// we saved at the current-1 (the suffix is updated when we save)
-	Variable saved_suffix = ModAsylumInterface#current_image_suffix()-1
+	Variable saved_suffix =  ModOfflineAsylum#current_image_suffix()-1
 	ModErrorUtil#assert(suffix_before_save == saved_suffix,msg="After save, suffix not changed")
 	// POST: suffix is consistent. go ahead and get the full path
-	String base_name = ModAsylumInterface#master_base_name()
+	String base_name =  ModOfflineAsylum#master_base_name()
 	String wave_name
 	sprintf wave_name,"%s%04d",base_name,saved_suffix
 	String save_path
@@ -126,7 +126,7 @@ Static Function Main([input_base])
 	struct indenter_info inf_tmp
 	setup(input_base,inf_tmp)
 	// // check saving out the data (test this before the gui-changing functions, below
-	Variable suffix_before_save = ModAsylumInterface#current_image_suffix()
+	Variable suffix_before_save = ModOfflineAsylum#current_image_suffix()
 	ModFastIndenter#align_and_save_struct(inf_tmp)
 	// Make sure the wave we just saved had the same data and same 
 	// note as the wave in memory

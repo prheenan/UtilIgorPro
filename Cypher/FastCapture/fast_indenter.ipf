@@ -8,6 +8,7 @@
 #include ":::Util:PlotUtil"
 #include ":::Util:Numerical"
 #include "::asylum_interface"
+#include "::OfflineAsylum"
 
 static constant DEF_NUMBER_OF_CALLS = 10
 static constant max_info_chars = 100
@@ -151,7 +152,7 @@ Static Function setup_gui_for_fast_capture()
 	//	None
 	// Returns:
 	// 	None, but thows errors if problem (e.g. Force Review isn't open)
-	String force_review = ModAsylumInterface#force_review_graph_name()
+	String force_review = ModOfflineAsylum#force_review_graph_name()
 	String master_force_name = "MasterForcePanel"
 	ModErrorUtil#Assert(ModIoUtil#WindowExists(master_force_name),msg="Must have Review panel open")
 	// POST: force review panel exists
@@ -180,7 +181,7 @@ Static Function setup_gui_for_fast_capture()
 	InfoStruct.Row = DimSize(InfoStruct.listWave,0)-1
 	Wave InfoStruct.selWave=$("root:ForceCurves:Parameters:SlaveFPBuddy")
 	Wave InfoStruct.colorWave=$("root:packages:MFP3D:TOC:ListColorWave")
-	InfoStruct.CtrlName = ModAsylumInterface#force_review_list_control_name()
+	InfoStruct.CtrlName = ModOfflineAsylum#force_review_list_control_name()
 	InfoStruct.Win = master_force_name
 	// these two are chosen to run properly in SelectFPByFolderProc
 	InfoStruct.EventCode = 2
@@ -233,7 +234,7 @@ Static Function align_and_save_struct(indenter_info,[suffix_low_res])
 	//	Nothing, saves out the wave
 	struct indenter_info & indenter_info
 	Variable suffix_low_res
-	Variable suffix =  ModAsylumInterface#get_wave_suffix_number(indenter_info.x_wave_high_res)
+	Variable suffix =  ModOfflineAsylum#get_wave_suffix_number(indenter_info.x_wave_high_res)
 	// low resolution is always saved first (the whole point of the callbacks)
 	// so its suffix is assumed one lower
 	if (ParamIsDefault(suffix_low_res))
@@ -264,11 +265,11 @@ Static Function align_and_save_struct(indenter_info,[suffix_low_res])
 	Variable n = DimSize(defl_wave,0)
 	// Before we do *anything* else, get the low resolution sampling rate
 	// (this allows us to determine the indices to split the wave later )
-	Variable freq_low = ModAsylumInterface#note_variable(low_res_note,"NumPtsPerSec")
+	Variable freq_low = ModOfflineAsylum#note_variable(low_res_note,"NumPtsPerSec")
 	// update the triggering parameters
-	low_res_note = ModAsylumInterface#update_note_triggering(low_res_note,low_res_approach_and_dwell,zsnsr_wave,freq_low,freq)
+	low_res_note = ModOfflineAsylum#update_note_triggering(low_res_note,low_res_approach_and_dwell,zsnsr_wave,freq_low,freq)
 	// update the resolution variables 
-	low_res_note = ModAsylumInterface#update_note_resolution(low_res_note,freq,n)
+	low_res_note = ModOfflineAsylum#update_note_resolution(low_res_note,freq,n)
 	// everything is set up; go ahead and set the notes 
 	Note zsnsr_wave, low_res_note
 	Note defl_wave, low_res_note
@@ -326,7 +327,7 @@ Static function setup_indenter([speed,timespan,zsnsr_wave,defl_wave])
 	speed = ParamIsDefault(speed) ? default_speed() : speed
 	timespan=ParamIsDefault(timespan) ? default_timespan() : timespan
 	// Determine the output wave names...
-	String default_base = (ModAsylumInterface#default_wave_base_name() + default_wave_base_suffix())
+	String default_base = (ModOfflineAsylum#default_wave_base_name() + default_wave_base_suffix())
 	// Make sure the output folder exists
 	String default_save = default_save_folder()
 	setup_directory_sturcture()	
@@ -349,7 +350,7 @@ Static function setup_indenter([speed,timespan,zsnsr_wave,defl_wave])
 	inf_tmp.points_per_second = ModFastCapture#speed_option_to_frequency_in_Hz(speed)
 	save_info_struct(inf_tmp)
 	// before anything else, make sure the review exists
-	String review_name = ModAsylumInterface#force_review_graph_name()
+	String review_name = ModOfflineAsylum#force_review_graph_name()
 	ModPlotUtil#assert_window_exists(review_name)
 	// POST: review exists, set up the gui (e.g. pick Defl and ZSnsr as what
 	// to display)

@@ -7,6 +7,7 @@
 #include "::Util:Numerical"
 #include "::Util:ErrorUtil"
 #include "::Cypher:asylum_interface"
+#include "::Cypher:OfflineAsylum"
 #include "::Cypher:Util:ForceReview"
 
 
@@ -83,7 +84,7 @@ Function tagging_list_change_hook(InfoStruct)
 	//	nothing
 	Struct WMListBoxAction &InfoStruct
 	// Delete the temporary data 
-	delete_tmp_data(ModAsylumInterface#force_review_graph_name())
+	delete_tmp_data(ModOfflineAsylum#force_review_graph_name())
 	// Call the asylum function 
 	SelectFPByFolderProc(InfoStruct)
 End Function
@@ -285,7 +286,7 @@ Static Function Main([error_on_no_force_review])
 	if (ParamIsDefault(error_on_no_force_review))
 		error_on_no_force_review = 1
 	EndIf
-	String window_name = ModAsylumInterface#force_review_graph_name()
+	String window_name = ModOfflineAsylum#force_review_graph_name()
 	setup_tagging()
 	delete_tmp_data(window_name)	
 	// Make sure the window exists, otherwise just do a top-level
@@ -294,7 +295,7 @@ Static Function Main([error_on_no_force_review])
 		ModErrorUtil#assert(!error_on_no_force_review)
 		window_name = ModPlotUtil#gcf()
 	else
-		ListBox $(ModAsylumInterface#force_review_list_control_name()) win=$(ModAsylumInterface#master_force_panel_name()),proc=$("tagging_list_change_hook")
+		ListBox $( ModOfflineAsylum#force_review_list_control_name()) win=$( ModOfflineAsylum#master_force_panel_name()),proc=$("tagging_list_change_hook")
 	EndIf
 	hook_cursor_current_directory(window_name)
 End Function
