@@ -433,7 +433,7 @@ Static Function /Wave GetUniqueIndex(StrList,Sep)
 	String strList,Sep
 	// Make a text wave for the list
 	Wave /T tmp = ModDataStructures#MakeWaveForList("TmpUni",StrList,Sep)
-	ModDataStructures#ListToTextWave(tmp,StrList,Sep=Sep)
+	ModDataStructures#pListToTextWave(tmp,StrList,Sep=Sep)
 	return GetUniTxtWaveIndex(tmp)
 End Function 
 
@@ -1428,7 +1428,7 @@ Static Function GetUniqueStems(tmpUnique,baseDir,SuffixNeeded,[fullPathStemPatte
 		return toRet
 	EndIf
 	Make /O/N=(NFullWaves)/T rawWaves
-	ModDataStructures#ListToTextWave(rawWaves,mWaves,Sep=ListSep)
+	ModDataStructures#pListToTextWave(rawWaves,mWaves,Sep=ListSep)
 	// get all the 'fullpath' stems
 	Make /O/N=(NFullWaves)/T fullPathStemsRaw
 	 ModIoUtil#GetWaveStems(rawWaves,fullPathStemsRaw,FullPathStemPattern)

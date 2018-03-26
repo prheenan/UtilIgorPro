@@ -174,7 +174,7 @@ Static Function /Wave MakeWaveForList(Name,List,Sep)
 	return MakeWave(Name,ItemsInList(List,Sep))
 End Function
 
-Static Function ListToTextWave(ToRet,List, [Sep])
+Static Function pListToTextWave(ToRet,List, [Sep])
 	String List,Sep
 	Wave /T ToRet
 	if (ParamIsDefault(Sep))
