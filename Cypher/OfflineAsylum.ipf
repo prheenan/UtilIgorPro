@@ -176,7 +176,7 @@ Static Function /S formatted_wave_name(base,suffix,[type])
 	return to_ret
 End Function
 
-Static Function /S note_string(note_v,key_to_get)
+Static Function /S note_string(note_v,key_to_get,[delim_key_val,delim_pairs])
 	// Gets an asylum-style value from its key in a note
 	
 	// Args:
@@ -184,10 +184,17 @@ Static Function /S note_string(note_v,key_to_get)
 	// Returns:
 	//	The value of sotred in the note of the key
 	String note_v,key_to_get
-	return StringByKey(key_to_get,note_v,":","\r")
+	String delim_key_val,delim_pairs
+	if (ParamIsDefault(delim_key_val))
+		delim_key_val = def_delim_key_value()
+	endif
+	if (ParamIsDefault(delim_pairs))
+		delim_pairs = def_delim_pairs()
+	EndIf
+	return StringByKey(key_to_get,note_v,delim_key_val,delim_pairs)
 End function
 
-Static Function note_variable(note_v,key_to_get)
+Static Function note_variable(note_v,key_to_get,[delim_key_val,delim_pairs])
 	// Returns a note variable as a number
 	//
 	// Args: 
@@ -195,8 +202,23 @@ Static Function note_variable(note_v,key_to_get)
 	// Returns
 	//    The variable (numeric) representation of the note value at the given key
 	String note_v,key_to_get
-	return str2num(note_string(note_v,key_to_get))
+	String delim_key_val,delim_pairs
+	if (ParamIsDefault(delim_key_val))
+		delim_key_val = def_delim_key_value()
+	endif
+	if (ParamIsDefault(delim_pairs))
+		delim_pairs = def_delim_pairs()
+	EndIf
+	return str2num(note_string(note_v,key_to_get,delim_key_val=delim_key_val,delim_pairs=delim_pairs))
 End Function
+
+Static Function /S def_delim_key_value()
+	return ":"
+End Function 
+
+Static Function /S def_delim_pairs()
+	return "\r"
+End Function 
 
 Static Function /S replace_note_string(note_v,key_to_replace,new_string,[delim_key_val,delim_pairs])
 	// replaces an asylum-style string value associated with a key
@@ -209,10 +231,10 @@ Static Function /S replace_note_string(note_v,key_to_replace,new_string,[delim_k
 	//	updated note
 	String note_v,key_to_replace,new_string,delim_key_val,delim_pairs
 	if (ParamIsDefault(delim_key_val))
-		delim_key_val = ":"
+		delim_key_val = def_delim_key_value()
 	endif
 	if (ParamIsDefault(delim_pairs))
-		delim_pairs = "\r"
+		delim_pairs = def_delim_pairs()
 	EndIf
 	return ReplaceStringbyKey(key_to_replace,note_v,new_string,delim_key_val,delim_pairs)
 End Function
