@@ -6,7 +6,7 @@
 #include "::Util:PlotUtil"
 #include "::Util:Numerical"
 #include "::Util:ErrorUtil"
-#include "::Cypher:asylum_interface"
+#include "::Cypher:OfflineAsylum"
 #include "::Cypher:Util:ForceReview"
 
 
@@ -28,6 +28,11 @@ Static Function setup_tagging()
 	NewDataFolder /O root:prh
 	NewDataFolder /O root:prh:tagging
 	NewDataFolder /O root:prh:tagging:filtered
+End Function
+
+Static Function filter_pct()
+	Variable filter_pct = 2e-2
+	return filter_pct 
 End Function
 
 Static Function /S get_output_path()
@@ -83,7 +88,7 @@ Function tagging_list_change_hook(InfoStruct)
 	//	nothing
 	Struct WMListBoxAction &InfoStruct
 	// Delete the temporary data 
-	delete_tmp_data(ModAsylumInterface#force_review_graph_name())
+	delete_tmp_data(ModOfflineAsylum#force_review_graph_name())
 	// Call the asylum function 
 	SelectFPByFolderProc(InfoStruct)
 End Function
@@ -123,7 +128,7 @@ Static Function update_filtered_data(fig)
 		String to_check = filtered_folder + wave_name + suffix
 		// Then make it by filtering
 		Duplicate /O wave_tmp $to_check
-		Variable n_points = DimSize(wave_tmp,0) * 1e-3
+		Variable n_points = DimSize(wave_tmp,0) * filter_pct()
 		ModNumerical#savitsky_smooth($to_check,n_points=n_points)
 		// Add it to the graph
 		// /Q: prevent other graphs from updating
@@ -285,7 +290,7 @@ Static Function Main([error_on_no_force_review])
 	if (ParamIsDefault(error_on_no_force_review))
 		error_on_no_force_review = 1
 	EndIf
-	String window_name = ModAsylumInterface#force_review_graph_name()
+	String window_name = ModOfflineAsylum#force_review_graph_name()
 	setup_tagging()
 	delete_tmp_data(window_name)	
 	// Make sure the window exists, otherwise just do a top-level
@@ -294,7 +299,7 @@ Static Function Main([error_on_no_force_review])
 		ModErrorUtil#assert(!error_on_no_force_review)
 		window_name = ModPlotUtil#gcf()
 	else
-		ListBox $(ModAsylumInterface#force_review_list_control_name()) win=$(ModAsylumInterface#master_force_panel_name()),proc=$("tagging_list_change_hook")
+		ListBox $( ModOfflineAsylum#force_review_list_control_name()) win=$( ModOfflineAsylum#master_force_panel_name()),proc=$("tagging_list_change_hook")
 	EndIf
 	hook_cursor_current_directory(window_name)
 End Function
