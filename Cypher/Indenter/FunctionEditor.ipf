@@ -258,15 +258,16 @@ Static Function default_staircase([start_x,delta_x,n_steps,time_dwell])
 	staircase_equilibrium(start_x,delta_x,n_steps,time_dwell,use_reverse=0)
 End Function
 
-Static Function default_inverse_boltzmann()
-	Variable start_boltzmann = -60
+Static Function default_inverse_boltzmann([start_boltzmann,point_spread_initial_step_nm,point_spread_dwell_s,n_initial_steps,time_initial_s,dwell_time_initial_s,step_second_psf_region_nm,step_boltz_nm,n_steps_boltz,dwell_boltz_s])
+	Variable start_boltzmann,point_spread_initial_step_nm,point_spread_dwell_s,n_initial_steps,time_initial_s,dwell_time_initial_s,step_second_psf_region_nm,step_boltz_nm,n_steps_boltz,dwell_boltz_s
+	start_boltzmann = ParamIsDefault(start_boltzmann) ? -60 : start_boltzmann
 	// parameters for the initial point spread function region 
-	Variable point_spread_initial_step_nm = -5
-	Variable point_spread_dwell_s = 0.5
-	Variable n_initial_steps = 4	
+	point_spread_initial_step_nm = ParamIsDefault(point_spread_initial_step_nm) ? -5 : point_spread_initial_step_nm
+	point_spread_dwell_s = ParamIsDefault(point_spread_dwell_s) ? 0.5 : point_spread_dwell_s 
+	n_initial_steps = ParamIsDefault(n_initial_steps)? 4 : n_initial_steps	
 	Variable start_staircase = start_boltzmann + abs((n_initial_steps) * point_spread_initial_step_nm)
-	Variable time_initial_s = 0.5
-	Variable dwell_time_initial_s = 1
+	time_initial_s = ParamIsDefault(time_initial_s) ? 0.5 : time_initial_s
+	dwell_time_initial_s = ParamIsDefault(dwell_time_initial_s) ? 1  : dwell_time_initial_s
 	Variable velocity_nm_per_s = abs(start_staircase/time_initial_s)
 	setup_for_new_indenter()
 	// make an effective dwell slightly into the surface, to avoid unit problems. 
@@ -280,12 +281,12 @@ Static Function default_inverse_boltzmann()
 	staircase_equilibrium(start_staircase,point_spread_initial_step_nm,n_initial_steps,point_spread_dwell_s)
 	new_segment()	
 	// Make the boltzmann staircase...
-	Variable step_boltz_nm = -0.33
-	Variable n_steps_boltz = 20
-	Variable dwell_boltz_s = 2
+	step_boltz_nm = ParamIsDefault(step_boltz_nm) ? -0.33 : step_boltz_nm
+	n_steps_boltz = ParamIsDefault(n_steps_boltz) ? 20 : n_steps_boltz
+	dwell_boltz_s = ParamIsDefault(dwell_boltz_s) ? 2 : dwell_boltz_s
 	staircase_equilibrium(start_boltzmann,step_boltz_nm,n_steps_boltz,dwell_boltz_s)
 	// Make the second psf region
-	Variable step_second_psf_region_nm = -5 
+	step_second_psf_region_nm = ParamIsDefault(step_second_psf_region_nm) ? -5 : step_second_psf_region_nm 
 	Variable start_second_psf_region_nm = start_boltzmann + step_boltz_nm * (n_steps_boltz-1) + step_second_psf_region_nm
 	Variable n_second_psf_region = n_initial_steps
 	Variable dwell_second_psf_region_s = point_spread_dwell_s
