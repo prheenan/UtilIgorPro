@@ -52,7 +52,7 @@ Static Function save_to_disk_volts(zsnsr_volts_wave,defl_volts_wave,[note_to_use
 	Make /O/N=0 defl_meters,z_meters
 	Variable z_lvdt_sensitivity = GV("ZLVDTSens")
 	Variable invols = (GV("Invols"))
-	volts_to_meters(zsnsr_volts_wave,defl_volts_wave,z_lvdt_sensitivity,invols,z_meters,defl_meters)
+	ModOfflineAsylum#volts_to_meters(zsnsr_volts_wave,defl_volts_wave,z_lvdt_sensitivity,invols,z_meters,defl_meters)
 	// save the zsnsr and defl to the disk
 	save_to_disk(z_meters,defl_meters,note_to_use)
 	KillWaves /Z defl_meters,z_meters
