@@ -31,7 +31,7 @@ Static Function setup_tagging()
 End Function
 
 Static Function filter_pct()
-	Variable filter_pct = 2e-2
+	Variable filter_pct = 0.2e-2
 	return filter_pct 
 End Function
 
