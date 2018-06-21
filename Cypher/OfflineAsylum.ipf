@@ -176,7 +176,7 @@ Static Function /S formatted_wave_name(base,suffix,[type])
 	return to_ret
 End Function
 
-Static Function /S note_string(note_v,key_to_get)
+Static Function /S note_string(note_v,key_to_get,[delim_key_val,delim_pairs])
 	// Gets an asylum-style value from its key in a note
 	
 	// Args:
@@ -184,10 +184,17 @@ Static Function /S note_string(note_v,key_to_get)
 	// Returns:
 	//	The value of sotred in the note of the key
 	String note_v,key_to_get
-	return StringByKey(key_to_get,note_v,":","\r")
+	String delim_key_val,delim_pairs
+	if (ParamIsDefault(delim_key_val))
+		delim_key_val = def_delim_key_value()
+	endif
+	if (ParamIsDefault(delim_pairs))
+		delim_pairs = def_delim_pairs()
+	EndIf
+	return StringByKey(key_to_get,note_v,delim_key_val,delim_pairs)
 End function
 
-Static Function note_variable(note_v,key_to_get)
+Static Function note_variable(note_v,key_to_get,[delim_key_val,delim_pairs])
 	// Returns a note variable as a number
 	//
 	// Args: 
@@ -195,18 +202,60 @@ Static Function note_variable(note_v,key_to_get)
 	// Returns
 	//    The variable (numeric) representation of the note value at the given key
 	String note_v,key_to_get
-	return str2num(note_string(note_v,key_to_get))
+	String delim_key_val,delim_pairs
+	if (ParamIsDefault(delim_key_val))
+		delim_key_val = def_delim_key_value()
+	endif
+	if (ParamIsDefault(delim_pairs))
+		delim_pairs = def_delim_pairs()
+	EndIf
+	return str2num(note_string(note_v,key_to_get,delim_key_val=delim_key_val,delim_pairs=delim_pairs))
 End Function
 
-Static Function /S replace_note_string(note_v,key_to_replace,new_string)
+Static Function /S def_delim_key_value()
+	return ":"
+End Function 
+
+Static Function /S def_delim_pairs()
+	return "\r"
+End Function 
+
+Static Function /S replace_note_string(note_v,key_to_replace,new_string,[delim_key_val,delim_pairs])
 	// replaces an asylum-style string value associated with a key
 	//
 	// Args:
 	//	see replace_note_variable
+	//   delim_key_val: the delimiter between key and value (.e.g ":" for "k:v")
+	//   delim_pairs: the delimiter between pairs of values
 	// Returns
 	//	updated note
-	String note_v,key_to_replace,new_string
-	return ReplaceStringbyKey(key_to_replace,note_v,new_string,":","\r")
+	String note_v,key_to_replace,new_string,delim_key_val,delim_pairs
+	if (ParamIsDefault(delim_key_val))
+		delim_key_val = def_delim_key_value()
+	endif
+	if (ParamIsDefault(delim_pairs))
+		delim_pairs = def_delim_pairs()
+	EndIf
+	return ReplaceStringbyKey(key_to_replace,note_v,new_string,delim_key_val,delim_pairs)
+End Function
+
+Static Function replace_wave_note_string(input_wave,key_to_replace,new_value,[delim_key_val,delim_pairs])
+	// 
+	// Args:
+	// 	 	input_wave: what note we are trying to reaplce
+	// 		others: see replace_note_string
+	Wave input_wave
+	String key_to_replace, new_value, delim_key_val, delim_pairs
+	if (ParamIsDefault(delim_key_val))
+		delim_key_val = ":"
+	endif
+	if (ParamIsDefault(delim_pairs))
+		delim_pairs = "\r"
+	EndIf
+	String note_old = note(input_wave)
+	String note_new = replace_note_string(note_old,key_to_replace,new_value,delim_key_val=delim_key_val,delim_pairs=delim_pairs)
+	Note /K input_wave
+	Note input_wave, note_new
 End Function
 
 Static Function /S replace_note_variable(note_v,key_to_replace,new_value)
@@ -272,4 +321,15 @@ Static Function note_z_sensitivity(wave_note)
 	//	the Z Liner voltage differential transducer (ZLVDT) sensitivity
 	String wave_note
 	return note_variable(wave_note,"ZLVDTSens")
+End Function
+
+Static Function set_wave_dx(input_wave,dx)
+	Wave input_wave
+	Variable dx
+	// Call: SetScale [Flags], [Dimension], [num1], [num2]
+	// /P: Per-point scaling. num2  is the delta index value - 
+	// the difference in scaled index value from one element to the next.
+	//  num1  is the starting index value - the scaled index for the first point in the dimension
+	Variable offset = DimOffset(input_wave,0)
+	SetScale /P x, offset, dx,"s",input_wave
 End Function

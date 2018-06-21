@@ -6,7 +6,10 @@
 #include "::Util:PlotUtil"
 #include "::Util:Numerical"
 #include "::Util:ErrorUtil"
+<<<<<<< HEAD
 #include "::Cypher:asylum_interface"
+=======
+>>>>>>> 77f66a2d8edb751baba1f7c5c6ced189f86a1385
 #include "::Cypher:OfflineAsylum"
 #include "::Cypher:Util:ForceReview"
 
@@ -29,6 +32,11 @@ Static Function setup_tagging()
 	NewDataFolder /O root:prh
 	NewDataFolder /O root:prh:tagging
 	NewDataFolder /O root:prh:tagging:filtered
+End Function
+
+Static Function filter_pct()
+	Variable filter_pct = 2e-2
+	return filter_pct 
 End Function
 
 Static Function /S get_output_path()
@@ -124,7 +132,7 @@ Static Function update_filtered_data(fig)
 		String to_check = filtered_folder + wave_name + suffix
 		// Then make it by filtering
 		Duplicate /O wave_tmp $to_check
-		Variable n_points = DimSize(wave_tmp,0) * 1e-3
+		Variable n_points = DimSize(wave_tmp,0) * filter_pct()
 		ModNumerical#savitsky_smooth($to_check,n_points=n_points)
 		// Add it to the graph
 		// /Q: prevent other graphs from updating

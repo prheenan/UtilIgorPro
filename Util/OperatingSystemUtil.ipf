@@ -20,14 +20,14 @@ Structure RuntimeMetaInfo
 	//path_to_research_directory: where Reseach lives
 	String path_to_research_directory
 	// path_to_input_file: where the input file lives
-       String path_to_input_file
-       // path_to_python_binary: where the binary file lives. Will be set it if doesn't exist
+   String path_to_input_file
+   // path_to_python_binary: where the binary file lives. Will be set it if doesn't exist
 	String path_to_python_binary
 	// // Do not set the following fields; they are set automagically / overwritten by Igor
 	// Where the main file lives. 
 	String path_to_main
 	// path_to_output_file: where the output file lives
-       String path_to_output_file
+   String path_to_output_file
 EndStructure
 
 
@@ -71,15 +71,17 @@ Static Function /S windows_preamble()
 	return "C:/"
 End Function
 
-Static Function execute_python(PythonCommand)
+Static Function execute_python(PythonCommand,input)
 	// executes a python command, given the options
 	//
 	// Args:
 	//	 	PythonCommand: the string to use 
+	//		input: RuntimeMetaInfo object, for getting the python binary
 	// Returns:
 	//		nothing; throws an error if it finds one.
 	String PythonCommand
-	ModOperatingSystemUtil#assert_python_binary_accessible()
+	Struct RuntimeMetaInfo & input
+	ModOperatingSystemUtil#assert_python_binary_accessible(input)
 	// POST: we can for sure call the python binary
 	if (!running_windows())
 		PythonCommand = ReplaceString(mac_preamble(), PythonCommand, "/");
@@ -121,28 +123,41 @@ Function running_windows()
 	return pos >= 0
 End
 
-Static Function /S python_binary_string()
+Static Function /S def_python_binary_string()
 	// Returns string for running python given this OS
 	//
 	// Returns:
 	//		1 if windows, 0 if mac
 	if (running_windows())
-		return "C:/Program Files/Anaconda2/python"
+		return "C:/ProgramData/Anaconda2/python.exe"
 	else
-		return "//anaconda/bin/python"
+		return "//anaconda/bin/python2"
 	endif
 End Function
 
+Static Function /S python_binary_string(input)
+	// Returns string for running python given this OS and input
+	//
+	// Returns:
+	//		relevant string (or default, if none exists)
+	 Struct RuntimeMetaInfo & input
+	 if (strlen(input.path_to_python_binary) > 0)
+	 	return input.path_to_python_binary;
+	 else
+	 	return def_python_binary_string();
+	 endif
+End Function
 
-Static Function assert_python_binary_accessible()
+Static Function assert_python_binary_accessible(input)
 	// Function which checks that python is accessible; if not, it throws an error.
 	//
 	//	Args:
-	//		None
+	//		input: RuntimeMetaInfo object
 	//	Returns:
 	//		None, interrupts execution if things are broken.
+   Struct RuntimeMetaInfo & input
 	String Command
-	String binary = ModOperatingSystemUtil#python_binary_string()
+	String binary = ModOperatingSystemUtil#python_binary_string(input)
 	// according to python -h:
 	// -V     : print the Python version number and exit (also --version)
 	sprintf Command,"%s --version",binary
@@ -400,7 +415,7 @@ Static Function get_output_waves(waves_references,output,[skip_lines,base_name,k
 		// kill the output file
 		// /Z: if the file doesn't exist, dont worry about it  (we assert we deleted below)
 		DeleteFile /Z (igor_path)
-		ModErrorUtil#Assert(V_flag == 0,msg="Couldn't delete output file")
+		ModErrorUtil#Assert(V_flag == 0,msg="Couldn't delete output file: " + igor_path + " Is it open somewhere?")
 	EndIf
 End Function
 
