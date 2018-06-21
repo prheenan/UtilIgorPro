@@ -6,10 +6,6 @@
 #include "::Util:PlotUtil"
 #include "::Util:Numerical"
 #include "::Util:ErrorUtil"
-<<<<<<< HEAD
-#include "::Cypher:asylum_interface"
-=======
->>>>>>> 77f66a2d8edb751baba1f7c5c6ced189f86a1385
 #include "::Cypher:OfflineAsylum"
 #include "::Cypher:Util:ForceReview"
 
@@ -19,19 +15,19 @@ Macro DataTagging()
 End Macro
 
 Static Function /S base_tagging_folder()
-	return "root:prh:tagging:"
+	return "root:prh:tag:"
 End Function
 
 Static Function /S default_filtered_folder()
 	// Returns: the folder where the filtered data lives. 
-	return (base_tagging_folder() + "filtered:")
+	return (base_tagging_folder() + "fil:")
 End Function
 
 Static Function setup_tagging()
 	// Sets up the file system for the tagging module
 	NewDataFolder /O root:prh
-	NewDataFolder /O root:prh:tagging
-	NewDataFolder /O root:prh:tagging:filtered
+	NewDataFolder /O root:prh:tag
+	NewDataFolder /O root:prh:tag:fil
 End Function
 
 Static Function filter_pct()
@@ -114,7 +110,7 @@ Static Function update_filtered_data(fig)
 	EndIf
 	// POST: something on plot 
 	String filtered_folder = default_filtered_folder()					
-	String suffix = "_F"	
+	String suffix = "_"	
 	String first = ModIoUtil#string_element(trace_list,0,sep=sep)
 	if (!WaveExists($(filtered_folder + first + suffix)))
 		delete_tmp_data(fig)
@@ -129,8 +125,10 @@ Static Function update_filtered_data(fig)
 		if (!WaveExists(wave_tmp))
 			continue
 		EndIf
-		String to_check = filtered_folder + wave_name + suffix
+		String to_check = wave_name + suffix
 		// Then make it by filtering
+		String restore_dir = ModIoUtil#cwd()
+		SetDataFolder $(filtered_folder)
 		Duplicate /O wave_tmp $to_check
 		Variable n_points = DimSize(wave_tmp,0) * filter_pct()
 		ModNumerical#savitsky_smooth($to_check,n_points=n_points)
@@ -139,6 +137,7 @@ Static Function update_filtered_data(fig)
 		// /W: specify window
 		// /C: specify color 
 		AppendToGraph/L=$("L0")/Q/W=$(fig)/C=(0,0,0) $to_check
+		SetDataFolder $(restore_dir)
 	EndFor
 End function
 
@@ -299,8 +298,8 @@ Static Function Main([error_on_no_force_review])
 	delete_tmp_data(window_name)	
 	// Make sure the window exists, otherwise just do a top-level
 	if (!ModIoUtil#WindowExists(window_name))
-		print("Couldn't find force review panel, attempting top level graph instead")
-		ModErrorUtil#assert(!error_on_no_force_review)
+		String msg = "Couldn't find force review panel, attempting top level graph instead"
+		ModErrorUtil#assert(!error_on_no_force_review,msg=msg)
 		window_name = ModPlotUtil#gcf()
 	else
 		ListBox $( ModOfflineAsylum#force_review_list_control_name()) win=$( ModOfflineAsylum#master_force_panel_name()),proc=$("tagging_list_change_hook")

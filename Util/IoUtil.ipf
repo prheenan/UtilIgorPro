@@ -129,6 +129,10 @@ Static Function /S DefFileRegex()
 	return DEFAULT_REGEX_FILE 
 End Function
 
+Static Function max_wave_name_length()
+	return 32
+End Function
+
 // Appends 'toAppend' to 'base' using mSep (directories, by default)
 ThreadSafe Static Function /S AppendedPath(Base,toAppend,[mSep])
 	String base,toAppend
