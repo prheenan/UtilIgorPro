@@ -305,6 +305,27 @@ Static Function fishing_refolding_experiment()
 	refolding_experiment(velocity_nm_per_s=500,n_ramps=1,start_ramp_nm=-23,end_ramp_nm=-87)	
 End Function 
 
+static function ramp_then_clamp([v_clamp_nm_per_s,z_clamp_nm,dwell_clamp_s])
+	Variable v_clamp_nm_per_s,z_clamp_nm,dwell_clamp_s;
+	Variable dwell_initial = 1;
+	setup_for_new_indenter()
+	v_clamp_nm_per_s = abs(v_clamp_nm_per_s)
+	// make the initial dwell
+	Variable global_zero = 1
+	Variable dwell_s = 1
+	make_segment(global_zero,global_zero,dwell_s,0)
+	new_segment()		
+	// make the 'ramp to the clamp'
+	Variable t_ramp = abs((z_clamp_nm-global_zero)/v_clamp_nm_per_s)
+	make_segment(global_zero,z_clamp_nm,t_ramp,v_clamp_nm_per_s)
+	new_segment()	
+	// make the clamp
+	make_segment(z_clamp_nm,z_clamp_nm,dwell_clamp_s,global_zero)
+	new_segment()			
+	// make the 'back to zero'  thing 
+	make_segment(z_clamp_nm,global_zero,t_ramp,v_clamp_nm_per_s)
+End Function
+
 Static function refolding_experiment([velocity_nm_per_s,n_ramps,start_ramp_nm,end_ramp_nm])	
 	Variable velocity_nm_per_s
 	Variable start_ramp_nm
