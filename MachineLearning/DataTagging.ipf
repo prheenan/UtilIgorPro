@@ -166,9 +166,10 @@ Static Function save_event_on_keyboard_enter(s)
 		// Get the base name; we want to get the absolute offset for the entire trace...
 		String base_name
 		// our regex is anything, following by numbers, a (possible) single underscore, then letters
-		String regex = "(.+?)[_]?[a-zA-Z_]+?$"
-		SplitString /E=(regex) info_struct.trace_name,base_name
-		Variable offset = ModForceReview#offset_from_wave_base(data_folder,base_name,info_struct.trace_name)
+		String regex =  "(.+?)[_]?[A-Z][a-z_]+?$"
+		String trace_name =  info_struct.trace_name
+		SplitString /E=(regex) trace_name,base_name
+		Variable offset = ModForceReview#offset_from_wave_base(data_folder,base_name,trace_name)
 		Variable start_idx = info_struct.a_idx + offset
 		Variable end_idx = info_struct.b_idx + offset
 		// POST: have the A and B cursors. Save them to the output file
