@@ -70,7 +70,7 @@ Static Function delete_tmp_data(fig)
 		EndIf
 		i += 1
 	while(1)
-	KillWaves /A
+	KillWaves /A/Z
 	SetDataFolder $(restore_folder)
 End Function
 
@@ -110,7 +110,7 @@ Static Function update_filtered_data(fig)
 	EndIf
 	// POST: something on plot 
 	String filtered_folder = default_filtered_folder()					
-	String suffix = "_"	
+	String suffix = "F"	
 	String first = ModIoUtil#string_element(trace_list,0,sep=sep)
 	if (!WaveExists($(filtered_folder + first + suffix)))
 		delete_tmp_data(fig)
@@ -163,6 +163,19 @@ Static Function save_event_on_keyboard_enter(s)
 		//
 		Variable kind =1
 		String data_folder = GetWavesDataFolder(info_struct.trace_reference,kind)
+		// Don't allow saving based on the filtered data; use the raw data
+		if (ModIoUtil#substring_exists(default_filtered_folder(),data_folder))
+			// Try to switch the wave reference. 
+			String unfiltered_name
+			SplitString /E=("([^F]+)F$") info_struct.trace_name,unfiltered_name
+			info_struct.trace_name = unfiltered_name
+			// update the reference and data folder.
+			Wave info_struct.trace_reference = TraceNameToWaveRef(window_name,unfiltered_name)
+			Variable unfiltered_exists = WaveExists(info_struct.trace_reference)
+			data_folder = GetWavesDataFolder(info_struct.trace_reference,kind)
+			// Make sure the data exist.
+			ModErrorUtil#Assert(unfiltered_exists,msg="Couldn't save based on unfiltered data.")
+		endif
 		// Get the base name; we want to get the absolute offset for the entire trace...
 		String base_name
 		// our regex is anything, following by numbers, a (possible) single underscore, then letters
