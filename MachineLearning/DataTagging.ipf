@@ -14,6 +14,13 @@ Macro DataTagging()
 	ModDataTagging#Main()
 End Macro
 
+Macro FilterCurrent()
+	String window_name = ModOfflineAsylum#force_review_graph_name()
+	ModDataTagging#delete_tmp_data(window_name)
+	ModDataTagging#update_filtered_data(window_name)
+End Macro
+
+
 Static Function /S base_tagging_folder()
 	return "root:prh:tag:"
 End Function
@@ -31,7 +38,7 @@ Static Function setup_tagging()
 End Function
 
 Static Function filter_pct()
-	Variable filter_pct = 0.2e-2
+	Variable filter_pct = 3e-4
 	return filter_pct 
 End Function
 
@@ -320,3 +327,4 @@ Static Function Main([error_on_no_force_review])
 	EndIf
 	hook_cursor_current_directory(window_name)
 End Function
+
