@@ -326,16 +326,18 @@ static function ramp_then_clamp([v_clamp_nm_per_s,z_clamp_nm,dwell_clamp_s])
 	make_segment(z_clamp_nm,global_zero,t_ramp,v_clamp_nm_per_s)
 End Function
 
-Static function refolding_experiment([velocity_nm_per_s,n_ramps,start_ramp_nm,end_ramp_nm])	
+Static function refolding_experiment([velocity_nm_per_s,n_ramps,start_ramp_nm,end_ramp_nm,refold_dwell_s])	
 	Variable velocity_nm_per_s
 	Variable start_ramp_nm
 	Variable end_ramp_nm
 	Variable n_ramps
+	Variable refold_dwell_s
 	// initialize everrything
 	velocity_nm_per_s = ParamIsDefault(velocity_nm_per_s) ? 50 : velocity_nm_per_s
 	start_ramp_nm =  ParamIsDefault(start_ramp_nm) ? -50 : start_ramp_nm
 	end_ramp_nm = ParamIsDefault(end_ramp_nm) ? -80 : end_ramp_nm
 	n_ramps = ParamIsDefault(n_ramps) ? 5 : n_ramps
+	refold_dwell_s = ParamIsDefault(refold_dwell_s) ? 0 : refold_dwell_s
 	Variable dwell_s = 1	
 	setup_for_new_indenter()
 	// Dwell into the surface
@@ -355,6 +357,10 @@ Static function refolding_experiment([velocity_nm_per_s,n_ramps,start_ramp_nm,en
 		new_segment()		
 		make_segment(end_ramp_nm,start_ramp_nm,time_fold_and_unfold,velocity_nm_per_s)
 		new_segment()			
+		if (refold_dwell_s > 0 )
+			make_segment(start_ramp_nm,start_ramp_nm,refold_dwell_s,0)
+			new_segment()				
+		endif 
 	EndFor
 	// Make a 'back to zero' 
 	make_segment(start_ramp_nm,global_zero,time_initial_s,velocity_nm_per_s)	
