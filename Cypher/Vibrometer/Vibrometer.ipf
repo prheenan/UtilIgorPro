@@ -37,8 +37,8 @@ Static Function setup_waves(n_points,decimation)
 	Wave wave_z = $(wave_name_z())
 	// Set up all the waves, make sure they 
 	ModErrorUtil#assert( (td_xsetinwave(0,"1","arc.input.Fast",wave_z,"",decimation) == 0))
-	ModErrorUtil#assert( (td_xsetinwave(0,"1","arc.input.A",wave_x,"",decimation) == 0))
-	ModErrorUtil#assert( (td_xsetinwave(0,"1","arc.input.B",wave_y,"",decimation) == 0))
+	ModErrorUtil#assert( (td_xsetinwave(1,"1","arc.input.A",wave_x,"",decimation) == 0))
+	ModErrorUtil#assert( (td_xsetinwave(2,"1","arc.input.B",wave_y,"",decimation) == 0))
 End Function
 
 Static Function Main([length_s,decimation,n_repeats])
