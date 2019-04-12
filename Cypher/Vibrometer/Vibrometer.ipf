@@ -56,6 +56,10 @@ End Function
 Static Function setup_waves()
 	NVAR GLOBAL_n_points 
 	NVAR GLOBAL_decimation
+	// clear everything
+	ModPlotUtil#clf(); 
+	// Kill the waves
+	KillWaves /Z prh_vibrometer_x , prh_vibrometer_y, prh_vibrometer_z ;
 	Make /O/N=(GLOBAL_n_points) $(wave_name_x()),$(wave_name_y()),$(wave_name_z())
 	Wave wave_x = $(wave_name_x())
 	Wave wave_y = $(wave_name_y())
@@ -76,11 +80,12 @@ Static Function setup_and_run()
 	run_until_complete()
 End Function 
 
-Static Function Main([length_s,decimation,n_repeats])
-	Variable length_s, decimation, n_repeats 
+Static Function Main([length_s,decimation,n_repeats,delay_s])
+	Variable length_s, decimation, n_repeats , delay_s
 	length_s = ParamIsDefault(length_s) ? 3 : length_s
 	decimation = ParamIsDefault(decimation) ? 10 : decimation
 	n_repeats = ParamIsDefault(n_repeats) ? 2 : n_repeats
+	delay_s = ParamIsDefault(delay) ? 0 :delay_s
 	// Determine how long the waves should be
 	Variable f_raw_Hz = 50e3
 	Variable f_decimated_Hz = f_raw_Hz/decimation
@@ -95,18 +100,12 @@ Static Function Main([length_s,decimation,n_repeats])
 	Variable /G GLOBAL_decimation = decimation
 	// MAke sure the crosspoint exists and is set up correctly
 	assert_crosspoint_OK()
+	// Delay, if needed
+	if (delay_s > 0)
+		sleep /S delay_s
+	endif
 	// write the waves on the callback.
 	// Note that this uses the global variable to correctly get the right number 
 	setup_and_run()
 End Function	
 
-Static Function MainWithDelay()
-	// clear everything
-	ModPlotUtil#clf(); 
-	// Kill the waves
-	KillWaves /Z prh_vibrometer_x , prh_vibrometer_y, prh_vibrometer_z ;
-	// Sleep (leavve the room to lower the noise!)
-	sleep /S 10
-	// get enough data
-	ModVibrometer#Main(n_repeats=100)	
-End Function
