@@ -1,6 +1,6 @@
 // Use modern global access method, strict compilation
 #pragma rtGlobals=3	
-
+#include "::Cypher:OfflineAsylum"
 #pragma ModuleName = ModTesting
 
 Static Function assert_wave_dimensions_OK(saved_wave,n_cols_expected,n_rows_expected)
@@ -49,8 +49,8 @@ Static Function assert_note_contained(note_expected,note_to_test,[break_pattern]
 			Continue
 		endif
 		String key = CustomItem[0,Index-1]
-		String value = ModAsylumInterface#note_string(note_to_test,key)
-		String expected_value = ModAsylumInterface#note_string(note_expected,key)
+		String value = ModOfflineAsylum#note_string(note_to_test,key)
+		String expected_value = ModOfflineAsylum#note_string(note_expected,key)
 		String msg
 		sprintf msg, "For Note key %s, expected '%s', found '%s'",key,expected_value,value
 		ModErrorUtil#Assert(ModIoUtil#strings_equal(expected_value,value),msg=msg)

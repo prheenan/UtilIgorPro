@@ -106,12 +106,20 @@ Static Function assert_infastb_correct([input_needed,msg_on_fail])
 	ModErrorUtil#assert(correct_input,msg=msg_on_fail)	
 End Function
 
+Static Function /S crosspoint_panel()
+	return "CrosspointPanel"
+End Function
+
+Static Function assert_crosspoint_exists()
+	String crosspoint_panel_name= crosspoint_panel()
+	//	the name of the ADC connected to InFastA
+	ModErrorUtil#assert(ModPlotUtil#window_exists(crosspoint_panel_name),msg="Crosspoint panel doesn't exist")
+End Function
+
 Static Function /S get_InFastA()
 	// Returns: 
-	//	the name of the ADC connected to InFastA
-	String crosspoint_panel = "CrosspointPanel"
-	ModErrorUtil#assert(ModPlotUtil#window_exists(crosspoint_panel),msg="Crosspoint panel doesn't exist")
-	ControlInfo /W=$(crosspoint_panel) CypherInFastBPopup
+	assert_crosspoint_exists()
+	ControlInfo /W=$(crosspoint_panel()) CypherInFastBPopup
 	// S_Value is 'set to text of the current item'
 	return S_Value
 End Function
