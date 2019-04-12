@@ -85,7 +85,7 @@ Static Function Main([length_s,decimation,n_repeats,delay_s])
 	length_s = ParamIsDefault(length_s) ? 3 : length_s
 	decimation = ParamIsDefault(decimation) ? 10 : decimation
 	n_repeats = ParamIsDefault(n_repeats) ? 2 : n_repeats
-	delay_s = ParamIsDefault(delay) ? 0 :delay_s
+	delay_s = ParamIsDefault(delay_s) ? 0 :delay_s
 	// Determine how long the waves should be
 	Variable f_raw_Hz = 50e3
 	Variable f_decimated_Hz = f_raw_Hz/decimation
