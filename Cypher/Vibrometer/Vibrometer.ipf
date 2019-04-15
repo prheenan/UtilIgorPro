@@ -44,7 +44,7 @@ Function prh_vibrometer_waves_to_csv()
 	NVAR GLOBAL_output_n 
 	sprintf output_name, "%sVibrometer%05d.csv", GLOBAL_output_folder,  GLOBAL_output_n
 	Save/O/J/M="\r\n"/W/U={1,1,0,0} prh_final as (output_name)
-	KillWaves /Z wave_x, wave_y, wave_z, prh_final
+	KillWaves /Z prh_final
 	// Increment the output N 
 	Variable /G GLOBAL_output_n = GLOBAL_output_n + 1
 	NVAR GLOBAL_max_n
