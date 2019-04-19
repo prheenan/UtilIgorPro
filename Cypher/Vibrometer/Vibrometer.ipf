@@ -50,6 +50,8 @@ Function prh_vibrometer_waves_to_csv()
 	NVAR GLOBAL_max_n
 	if (GLOBAL_output_n < GLOBAL_max_n) 
 		setup_and_run()
+	else
+		print("ModVibrometer::prh_vibrometer_waves_to_csv. All CSVs completed")
 	endif
 End Function
 

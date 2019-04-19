@@ -301,8 +301,11 @@ Static Function slow_refolding_experiment()
 	refolding_experiment(velocity_nm_per_s=50,n_ramps=5,start_ramp_nm=-23,end_ramp_nm=-87)	
 End Function
 
-Static Function fishing_refolding_experiment()
-	refolding_experiment(velocity_nm_per_s=500,n_ramps=1,start_ramp_nm=-23,end_ramp_nm=-87)	
+Static Function fishing_refolding_experiment([start_ramp_nm,end_ramp_nm])
+	Variable start_ramp_nm, end_ramp_nm
+	start_ramp_nm = ParamIsDefault(start_ramp_nm) ? -23 : start_ramp_nm
+	end_ramp_nm = ParamIsDefault(end_ramp_nm) ? -85 : end_ramp_nm
+	refolding_experiment(velocity_nm_per_s=500,n_ramps=1,start_ramp_nm=start_ramp_nm,end_ramp_nm=end_ramp_nm)	
 End Function 
 
 static function ramp_then_clamp([v_clamp_nm_per_s,z_clamp_nm,dwell_clamp_s])
