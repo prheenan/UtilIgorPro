@@ -2,7 +2,7 @@
 #pragma ModuleName = ModReportUtil
 #include "::Util:PlotUtil" 
 
-
+	
 Static Function FEC_Plot(WaveX,WaveY,[split_idx,XFactor,YFactor,Title,NFilterPoints,OffsetY,OffsetX,SignX,SignY,LegendLoc,SortByX])
 	Wave WaveX,WaveY
 	Variable XFactor,YFactor,NFilterPoints,OffsetY,OffsetX,SignX,SignY,SortByX,split_idx

@@ -1104,29 +1104,32 @@ Static Function DefColorIter(i,RGB,PlotDef,[MaxColors])
 	RGB = PlotDef.colors.AllColors[index]
 End Function
 
-Static Function AxisLim(lower,upper,name,windowName)
-	Variable lower,upper
+Static Function AxisLim(lower,upper,name,windowName,[auto_scale])
+	Variable lower,upper,auto_scale
 	String name,Windowname
+	auto_scale = ParamIsDefault(auto_scale) ?  ModDefine#False(): auto_scale
 	// XXX check for error? does window exist, etc
 	SetAxis /W=$windowName $name,lower,upper
        // 'DoUpdate' will autoscale for us 
        // autoscale the other axis
-       String axisToScale
-       strswitch (name)
-               case X_AXIS_DEFLOC:
-                       // also adjust y to be in the range
-                       axisToScale = Y_AXIS_DEFLOC
-                       break
-               case Y_AXIS_DEFLOC:
-                       // also adjust x to be in the range
-                       axisToScale = X_AXIS_DEFLOC
-                       break
-       EndSwitch
-       // '/A' flag autoscales
-       SetAxis /A=2/W=$windowName $axisToScale
+       if (auto_scale)
+       	String axisToScale
+	       strswitch (name)
+       	        case X_AXIS_DEFLOC:
+             	          // also adjust y to be in the range
+                   		    axisToScale = Y_AXIS_DEFLOC
+                   	    	    break
+	               case Y_AXIS_DEFLOC:
+      		                 // also adjust x to be in the range
+             		    axisToScale = X_AXIS_DEFLOC
+                       	    break
+	       EndSwitch
+	       // '/A' flag autoscales
+	       SetAxis /A=2/W=$windowName $axisToScale
+	endif
 End Function
 
-Static Function XLim(lower,upper,[graphName])
+Static Function XLim(lower,upper,[graphName,auto_scale])
 	// Gets the x limits by refernec
 	//
 	// Args:
@@ -1136,23 +1139,23 @@ Static Function XLim(lower,upper,[graphName])
 	//	graphName: which graph to use. defaults to current/top
 	// Returns: 
 	//	nothing, but sets the lower and upper to the x limits
-	Variable lower,upper
+	Variable lower,upper,auto_scale
 	String graphName
 	If (ParamISDefault(graphName))
 		graphName = gcf()
 	EndIf
 	// POST: we have a windowname
-	AxisLim(lower,upper,X_AXIS_DEFLOC,graphName)
+	AxisLim(lower,upper,X_AXIS_DEFLOC,graphName,auto_scale=auto_scale)
 End Function
 
-Static Function YLim(lower,upper,[graphName])
-	Variable lower,upper
+Static Function YLim(lower,upper,[graphName,auto_scale])
+	Variable lower,upper, auto_scale
 	String graphName
 	If (ParamISDefault(graphName))
 		graphName = gcf()
 	EndIf
 	// POST: we have a windowname
-	AxisLim(lower,upper,Y_AXIS_DEFLOC,graphName)
+	AxisLim(lower,upper,Y_AXIS_DEFLOC,graphName,auto_scale=auto_scale)
 End Function
 
 Static Function /S ForceStr()
@@ -1662,12 +1665,14 @@ Static Function /S SoftenColorRGBString(color)
 End Function
 
 // Plot rawdata as grey, then filter it and plot the filtiered using 'color'
-Static Function PlotWithFiltered(RawData,[graphName,X,color,nFilterPoints,rawColor])
+Static Function PlotWithFiltered(RawData,[graphName,X,color,nFilterPoints,rawColor,alpha,plot_raw])
 	// Plot the raw data as a grey line
 	Wave RawData,X
-	Variable nFilterPoints
+	Variable nFilterPoints,alpha,plot_raw
 	String color,graphName,rawColor
 	Variable nDataPoints = DimSize(RawData,0)
+	alpha = ParamIsDefault(alpha)? DEF_ALPHA : alpha 
+	plot_raw = ParamIsDefault(plot_raw) ? ModDefine#True() : plot_raw
 	if (ParamIsDefault(graphName))
 		graphName = gcf()
 	EndIf
@@ -1681,10 +1686,10 @@ Static Function PlotWithFiltered(RawData,[graphName,X,color,nFilterPoints,rawCol
 		rawColor = SoftenColorRGBString(color)
 	endIf
 	String rawMarker = ""
-	if (!ParamIsDefault(X))
-		ModPlotUtil#Plot(RawData,graphName=graphName,marker=rawMarker,color=rawColor,mX=X)
-	Else
-		ModPlotUtil#Plot(RawData,graphName=graphName,marker=rawMarker,color=rawColor)		
+	if (!ParamIsDefault(X) && plot_raw )
+		ModPlotUtil#Plot(RawData,graphName=graphName,marker=rawMarker,color=rawColor,mX=X,alpha=alpha)
+	Elseif (plot_raw)
+		ModPlotUtil#Plot(RawData,graphName=graphName,marker=rawMarker,color=rawColor,alpha=alpha)		
 	EndIf
 	// Get a filtered version of the raw data
 	String filterName = NameOfWave(RawData) + "filtered"
@@ -1694,10 +1699,13 @@ Static Function PlotWithFiltered(RawData,[graphName,X,color,nFilterPoints,rawCol
 	// Plot the filtered version of the data
 	// Use the same marker (just a line) 
 	if (!ParamIsDefault(X))
-		
-		ModPlotUtil#Plot(Smoothed,marker=rawMarker,color=color,graphName=graphName,mX=X)
+		String filterNameX = NameOfWave(X) + "filtered"
+		Duplicate /O X, $filterNameX
+		Wave SmoothedX = $filterNameX
+		ModNumerical#savitsky_smooth(SmoothedX,n_points=nFIlterPoints)
+		ModPlotUtil#Plot(Smoothed,marker=rawMarker,color=color,graphName=graphName,mX=SmoothedX,alpha=alpha)
 	Else
-		ModPlotUtil#Plot(Smoothed,marker=rawMarker,color=color,graphName=graphName)		
+		ModPlotUtil#Plot(Smoothed,marker=rawMarker,color=color,graphName=graphName,alpha=alpha)		
 	EndIf
 End Function
 
